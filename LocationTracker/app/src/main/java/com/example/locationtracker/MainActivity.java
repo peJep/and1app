@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Get model
+        //should eventually be instantiated after user login is verified (lazy instantiation) and user data is retrieved from webservice and stored in local model
         model = Model.getInstance();
 
         loginButton = findViewById(R.id.button);

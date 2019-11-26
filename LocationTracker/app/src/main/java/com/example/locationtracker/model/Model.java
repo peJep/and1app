@@ -16,15 +16,30 @@ public class Model implements Serializable {
 
     //fields
 
-    private ArrayList<Device> devices;
+    private ArrayList<Device> availableDevices;
 
     //stores response from webservice to put in RecyclerView.
+
+    private ArrayList<Device> userDevices;
+
     private ArrayList<Device> lostDevices;
 
     //constructor
     private Model(){
-        devices=generateAvailableDeviceArrayList();
-        lostDevices= generateLostDeviceArrayList();
+
+        //should be retrieved from bluetooth and separate from users devises (separate ArrayList should be made eventually) retrieved by webservice on login time
+        availableDevices =generateAvailableDeviceArrayList();
+
+        //should be retrieved by webservice on login time
+
+        //current users devices not list. When adding available devices incoming from bluetooth then devices already on users list is filtered before put into availableDevices
+        userDevices = generateUserDeviceArrayLIst();
+
+        //only for currentUser to deselect availableDevices from personal lost list.
+        lostDevices= generateLostDeviceArrayList(); //App the app encounters available availableDevices from the phones bluetooth it should automatically check with webservice if another users reported these availableDevices as lost and if the send new last known gps location to webservice. Then other user is prompted about new last know location automatically uploaded from other users app of current users lost availableDevices on login time or when accessing lost availableDevices sections of current users app.
+
+
+
     }
 
     public ArrayList<Device> generateLostDeviceArrayList() {
@@ -35,12 +50,14 @@ public class Model implements Serializable {
         devices.add(new Device("Kakuna", "Brick", 0));
         devices.add(new Device("Pidgey", "Brick", 0));
 
-        //set devices as lost
+        //set availableDevices as lost and belonging to currentUser
         for (Device i: devices
         ) {
             i.setDeviceLost(true);
             //Set last know coordinate from original owners phone at the time when lost
             i.setLastKnownLocation("N"+(int)(Math.random()*90)+"V"+(int)(Math.random()*90));
+            //set belonging to current user
+            i.setUser("currentUser");
         }
 
         return devices;
@@ -55,31 +72,14 @@ public class Model implements Serializable {
         devices.add(new Device("Venusaur", "Large-gps", randomStartLocation()));
         devices.add(new Device("Charmander", "cake", randomStartLocation()));
         devices.add(new Device("Charmeleon", "pie", randomStartLocation()));
-        devices.add(new Device("Charizard", "Bluetooh-small", randomStartLocation()));
-        devices.add(new Device("Squirtle", "Bluetooh-small", randomStartLocation()));
-        devices.add(new Device("Wartortle", "cake", randomStartLocation()));
-        devices.add(new Device("Blastoise", "pie", randomStartLocation()));
-        devices.add(new Device("Caterpie", "Large-gps", randomStartLocation()));
-        devices.add(new Device("Metapod", "Brick", randomStartLocation()));
-        devices.add(new Device("Butterfree", "Large-gps", randomStartLocation()));
+
         //add more copy items
         int extraItemsToAdd = 0;
         int arraySizeBefore = devices.size();
         for (int i = 0; i < extraItemsToAdd; i++) {
             devices.add(devices.get((int) (arraySizeBefore * Math.random() - 0.0001)).copy());
         }
-        //set some devices as belonging to current user
-        int numberOfDevicesToAdd = 7;
-        String userName ="currentUser";
-        for (int i = 0; i < numberOfDevicesToAdd;i++){
-            int markDeviceNumber = (int)(Math.random()*devices.size()-0.0001);
-            //already marked as belonging to current user
-            if(devices.get(markDeviceNumber).getUser() != null
-                    && userName.equals(devices.get(markDeviceNumber).getUser()))
-                i--;
-            else
-                devices.get(markDeviceNumber).setUser(userName);
-        }
+
         //return device ArrayList
         return devices;
     }
@@ -89,14 +89,42 @@ public class Model implements Serializable {
         return (int) (Math.random() * maxPossibleDistanceModifier * maxWithinRange);
     }
 
-    //setters and getters
+    public ArrayList<Device> generateUserDeviceArrayLIst(){
 
-    public ArrayList<Device> getDevices() {
+        ArrayList<Device> devices = new ArrayList<Device>();
+        devices.add(new Device("Charizard", "Bluetooh-small", randomStartLocation()));
+        devices.add(new Device("Squirtle", "Bluetooh-small", randomStartLocation()));
+        devices.add(new Device("Wartortle", "cake", randomStartLocation()));
+        devices.add(new Device("Blastoise", "pie", randomStartLocation()));
+        devices.add(new Device("Caterpie", "Large-gps", randomStartLocation()));
+        devices.add(new Device("Metapod", "Brick", randomStartLocation()));
+        devices.add(new Device("Butterfree", "Large-gps", randomStartLocation()));
+
+        //set as belonging to current user
+        for (Device i: devices
+             ) {
+            i.setUser("currentUser");
+        }
+
         return devices;
     }
 
-    public void setDevices(ArrayList<Device> devices) {
-        this.devices = devices;
+    //setters and getters
+
+    public ArrayList<Device> getAvailableDevices() {
+        return availableDevices;
+    }
+
+    public void setAvailableDevices(ArrayList<Device> devices) {
+        this.availableDevices = devices;
+    }
+
+    public ArrayList<Device> getUserDevices() {
+        return userDevices;
+    }
+
+    public void setUserDevices(ArrayList<Device> userDevices) {
+        this.userDevices = userDevices;
     }
 
     public ArrayList<Device> getLostDevices() {

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -55,6 +54,12 @@ public class AddDevice extends AppCompatActivity {
                 for (Device i : addToUser
                 ) {
                     i.setUser("currentUser");
+
+                    //add to users devices
+                    model.getUserDevices().add(i);
+                    //delete from available devices
+                    model.getAvailableDevices().remove(i);
+
                 }
                 //redraw RecyclerView as needed to reflect changes.
                 updateRecyclerView();
@@ -65,15 +70,9 @@ public class AddDevice extends AppCompatActivity {
 
     //Shared abstractions  / helper methods
     private void updateRecyclerView() {
-        if (model.getDevices() != null) {
-            ArrayList<Device> devices = model.getDevices();
-            ArrayList<Device> availableDevices = new ArrayList<>();
-            for (int i = 0; i < devices.size(); i++) {
-                //if device not assigned to any user yet, then add it to the list.
-                if (devices.get(i).getUser() == null) {
-                    availableDevices.add(devices.get(i));
-                }
-            }
+        if (model.getAvailableDevices() != null) {
+            //get available devices from model
+            ArrayList<Device> availableDevices = model.getAvailableDevices();
             //add devices to RecyclerView adaptor
             myDevicesAdaptor = new DeviceAdapter(availableDevices);
             myDevicesList.setAdapter(myDevicesAdaptor);

@@ -24,6 +24,8 @@ public class MyDevices extends AppCompatActivity {
 
     Button addDevice;
     Button removeDevice;
+    Button reportAsLost;
+    Button findDevice;
 
     RecyclerView myDevicesList;
     DeviceAdapter myDevicesAdaptor;
@@ -53,6 +55,7 @@ public class MyDevices extends AppCompatActivity {
         updateRecyclerView();
 
         //reference buttons
+
         //add button
         addDevice = findViewById(R.id.button2);
         //set clicklistener
@@ -61,8 +64,6 @@ public class MyDevices extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MyDevices.this, AddDevice.class);
                 startActivity(intent);
-
-                myDevicesAdaptor.getSelectedItems();
             }
         });
 
@@ -77,27 +78,59 @@ public class MyDevices extends AppCompatActivity {
                 for (Device i : toRemoveFromUser
                 ) {
                     i.setUser(null);
+                    //add to available devices
+                    model.getAvailableDevices().add(i);
+                    //remove from users devices
+                    model.getUserDevices().remove(i);
                 }
                 //redraw RecyclerView as needed to reflect changes.
                 updateRecyclerView();
             }
         });
 
+        //report as lost button
+        reportAsLost = findViewById(R.id.button4);
+        //set clicklistener
+        reportAsLost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //un-mark user as owner off selected items and
+                ArrayList<Device> toReportAsLost = myDevicesAdaptor.getSelectedItems();
+                for (Device i : toReportAsLost
+                ) {
+                    //Set device as lost. Not needed anymore when separation devices into separate ArrayLists: found, available, currentUsers in Model
+                    i.setDeviceLost(true);
+                    //get last know location from phones gps last time it was the deveice was in range
+                    i.setLastKnownLocation("N"+(int)(Math.random()*90)+"V"+(int)(Math.random()*90));
 
+                    //add to lost devices
+                    model.getLostDevices().add(i);
+                    //delete from available devices
+                    model.getUserDevices().remove(i);
+                }
+                //redraw RecyclerView as needed to reflect changes.
+                updateRecyclerView();
+            }
+        });
+
+        //find button
+        findDevice = findViewById(R.id.button6);
+        //set clicllistener
+        findDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MyDevices.this, LostDevices.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
     //Shared abstractions  / helper methods
     private void updateRecyclerView() {
-        if (model.getDevices() != null) {
-            ArrayList<Device> devices = model.getDevices();
-            ArrayList<Device> currentUsersDevices = new ArrayList<>();
-            for (int i = 0; i < devices.size(); i++) {
-                if (devices.get(i).getUser() != null
-                        && devices.get(i).getUser().equals("currentUser")) {
-                    currentUsersDevices.add(devices.get(i));
-                }
-            }
+        if (model.getAvailableDevices() != null) {
+            //get current users devices from model
+            ArrayList<Device> currentUsersDevices = model.getUserDevices();
             //add devices to RecyclerView adaptor
             myDevicesAdaptor = new DeviceAdapter(currentUsersDevices);
             myDevicesList.setAdapter(myDevicesAdaptor);

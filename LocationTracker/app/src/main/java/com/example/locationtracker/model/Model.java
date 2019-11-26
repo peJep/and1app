@@ -1,7 +1,22 @@
 package com.example.locationtracker.model;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.example.locationtracker.MainActivity;
+import com.example.locationtracker.webApi.PokemonApi;
+import com.example.locationtracker.webApi.PokemonResponse;
+import com.example.locationtracker.webApi.ServiceGenerator;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Model implements Serializable {
     //Singleton field
@@ -29,9 +44,11 @@ public class Model implements Serializable {
     //constructor
     private Model(){
 
+
         //should be retrieved from bluetooth and separate from users devises (separate ArrayList should be made eventually) retrieved by webservice on login time
         availableDevices =generateAvailableDeviceArrayList();
 
+        //a reference to objects could be fetched from webservice instead comparing to object references in local storage SQLite then only retrieving object not already in local storage for reducing network traffic on webservice load
         //should be retrieved by webservice on login time
 
         //current users devices not list. When adding available devices incoming from bluetooth then devices already on users list is filtered before put into availableDevices
@@ -109,6 +126,25 @@ public class Model implements Serializable {
         }
 
         return devices;
+    }
+
+    //webservice - used to check of devices added from bluetooth match devices on lost devices lst from webservice
+    public void checkIfLostDeviceOnWebService(final Device device) {
+        PokemonApi pokemonApi = ServiceGenerator.getPokemonApi();
+        Call<PokemonResponse> call = pokemonApi.getPokemon(device.getDeviceName());
+        call.enqueue(new Callback<PokemonResponse>() {
+            @Override
+            public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
+                if (response.code() == 200) {
+                        //device found on webservice
+                        //how do I get the response.body() data out of this inner class?
+                }
+            }
+            @Override
+            public void onFailure(Call<PokemonResponse> call, Throwable t) {
+                Log.i("Retrofit", "Something went wrong :(");
+            }
+        });
     }
 
     //setters and getters

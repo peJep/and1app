@@ -6,9 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.locationtracker.model.Device;
 import com.example.locationtracker.model.Model;
+import com.example.locationtracker.webApi.PokemonResponse;
 
 import java.util.ArrayList;
 

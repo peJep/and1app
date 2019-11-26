@@ -1,6 +1,8 @@
 package com.example.locationtracker;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,6 +14,7 @@ import android.widget.Button;
 import com.example.locationtracker.model.Device;
 import com.example.locationtracker.model.Model;
 import com.example.locationtracker.recyclerView.DeviceAdapter;
+import com.example.locationtracker.viewModel.DeviceListViewModel;
 
 import java.util.ArrayList;
 
@@ -21,6 +24,7 @@ public class MyDevices extends AppCompatActivity {
     //Bundle bundle;
     //Model retrieved from singleton
     Model model;
+    DeviceListViewModel viewModel;
 
     Button addDevice;
     Button removeDevice;
@@ -39,6 +43,29 @@ public class MyDevices extends AppCompatActivity {
         //retrieve model
         model = Model.getInstance();
         //bundle = getIntent().getExtras();
+
+        //store current logged in users devices in ViewModel from Model
+        viewModel = ViewModelProviders.of(this).get(DeviceListViewModel.class);
+        viewModel.setDevices(Model.getInstance().getUserDevices());
+        //observe changes in ViewModel devices
+        viewModel.getDevices().observe(this, new Observer<ArrayList<Device>>() {
+            @Override
+            public void onChanged(ArrayList<Device> devices) {
+                //update RecyclerView when the observed list of devices is changed
+                updateRecyclerView();
+            }
+        });
+        //for observer pattern to work MutableLiveData<>.setValue() must be called.
+        // Not enough to change data referenced in MutableLiveData<> for observers to be notified.
+
+        //I showcase LiveData observer pattern in removeDevice.setOnClickListener method within this method. Refer to the implementation of removeDevice.setOnClickListener in this activity.
+
+        // Since it is bad practice to share references to ViewModels in between classes then ViewModel is useless as LiveData wrapper for me.
+        //Maybe use Model with LiveData wrapped device list both then Model must be View Model and then it should not be shared in between activities since bad practice to share ViewModel in between activities.
+        //I already use updateRecyclerView() whenever something is changed within an activity. The problem is when something changes from another activity.
+        //better to use updateRecyclerView() when an activity is resumed.
+        //like this: Refer to onResume() in this activity.
+
 
         //reference views and set functionality
 
@@ -82,9 +109,14 @@ public class MyDevices extends AppCompatActivity {
                     model.getAvailableDevices().add(i);
                     //remove from users devices
                     model.getUserDevices().remove(i);
+
+                    //here i use LiveData, just to show that the viewModel observer pattern works
+                    //note that i do not call updateRecyclerView() inside this method. Update updateRecyclerView() still happens through Observer.onChanged(ArrayList<Device> devices).
+                    viewModel.setDevices(model.getUserDevices());
                 }
                 //redraw RecyclerView as needed to reflect changes.
-                updateRecyclerView();
+                //Use LiveData observer pattern and ViewModel to update RecyclerView instead though Observer.onChanged()
+                //updateRecyclerView();
             }
         });
 
@@ -124,6 +156,13 @@ public class MyDevices extends AppCompatActivity {
             }
         });
 
+    }
+
+    //used to Update RecyclerView if model data was changed by other activities while this activity was paused
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateRecyclerView();
     }
 
     //Shared abstractions  / helper methods

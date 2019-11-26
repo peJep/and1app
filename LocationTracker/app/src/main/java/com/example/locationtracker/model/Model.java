@@ -16,6 +16,8 @@ public class Model implements Serializable {
 
     //fields
 
+    //stores response from bluetooth
+
     private ArrayList<Device> availableDevices;
 
     //stores response from webservice to put in RecyclerView.

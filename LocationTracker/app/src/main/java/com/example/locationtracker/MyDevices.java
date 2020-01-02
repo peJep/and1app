@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.locationtracker.model.Device;
 import com.example.locationtracker.model.Model;
@@ -43,6 +44,9 @@ public class MyDevices extends AppCompatActivity {
         //retrieve model
         model = Model.getInstance();
         //bundle = getIntent().getExtras();
+
+        //Check if any found devices were on webservice retrofit 2
+        Toast.makeText(this,"Number of lost devices found: "+model.getWebServiceResponse().size(),Toast.LENGTH_LONG).show();
 
         //store current logged in users devices in ViewModel from Model
         viewModel = ViewModelProviders.of(this).get(DeviceListViewModel.class);

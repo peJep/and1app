@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.locationtracker.MainActivity;
+import com.example.locationtracker.MyApplicationContext;
 import com.example.locationtracker.webApi.PokemonApi;
 import com.example.locationtracker.webApi.PokemonResponse;
 import com.example.locationtracker.webApi.ServiceGenerator;
@@ -41,6 +42,9 @@ public class Model implements Serializable {
 
     private ArrayList<Device> lostDevices;
 
+    //hold response from webservice when device is found. Webservice is called whenever bluetooth detects a new device that is not on current users list. If the detected device is identified as lost on webservice a response is given.
+    private ArrayList<PokemonResponse> webServiceResponse;
+
     //constructor
     private Model(){
 
@@ -57,10 +61,13 @@ public class Model implements Serializable {
         //only for currentUser to deselect availableDevices from personal lost list.
         lostDevices= generateLostDeviceArrayList(); //App the app encounters available availableDevices from the phones bluetooth it should automatically check with webservice if another users reported these availableDevices as lost and if the send new last known gps location to webservice. Then other user is prompted about new last know location automatically uploaded from other users app of current users lost availableDevices on login time or when accessing lost availableDevices sections of current users app.
 
-
-
+        webServiceResponse = new ArrayList<>();
     }
 
+
+    //constructor helper methods
+
+    //mock data to be retrieved on login time for current user
     public ArrayList<Device> generateLostDeviceArrayList() {
 
         ArrayList<Device> devices = new ArrayList<Device>();
@@ -82,7 +89,8 @@ public class Model implements Serializable {
         return devices;
     }
 
-    //constructor helper methods
+
+    //mock data to be retrieved on from bluetooth initially and on demand.
 
     public ArrayList<Device> generateAvailableDeviceArrayList() {
         ArrayList<Device> devices = new ArrayList<Device>();
@@ -91,6 +99,15 @@ public class Model implements Serializable {
         devices.add(new Device("Venusaur", "Large-gps", randomStartLocation()));
         devices.add(new Device("Charmander", "cake", randomStartLocation()));
         devices.add(new Device("Charmeleon", "pie", randomStartLocation()));
+
+        //after list have been filtered for devices already on current users list then check with webservice if any detected device from bluetooth
+        //is present as a lost device on the webservice.
+
+        //call webservice to to check if detected devices are marked as lost by another user;
+        for (Device d: devices
+             ) {
+            checkIfLostDeviceOnWebService(d);
+        }
 
         //add more copy items
         int extraItemsToAdd = 0;
@@ -107,6 +124,9 @@ public class Model implements Serializable {
         double maxPossibleDistanceModifier = 2.0;
         return (int) (Math.random() * maxPossibleDistanceModifier * maxWithinRange);
     }
+
+
+    //mock data to be retrieved on login time for current user
 
     public ArrayList<Device> generateUserDeviceArrayLIst(){
 
@@ -138,6 +158,7 @@ public class Model implements Serializable {
                 if (response.code() == 200) {
                         //device found on webservice
                         //how do I get the response.body() data out of this inner class?
+                        Model.getInstance().addWebServiceResponce(response.body());
                 }
             }
             @Override
@@ -172,4 +193,17 @@ public class Model implements Serializable {
     public void setLostDevices(ArrayList<Device> lostDevices) {
         this.lostDevices = lostDevices;
     }
+
+    public void setWebServiceResponse(ArrayList<PokemonResponse> webServiceResponse) {
+        this.webServiceResponse = webServiceResponse;
+    }
+
+    public ArrayList<PokemonResponse> getWebServiceResponse() {
+        return webServiceResponse;
+    }
+
+    public void addWebServiceResponce(PokemonResponse pokemonResponse){
+        this.webServiceResponse.add(pokemonResponse);
+    }
+
 }

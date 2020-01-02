@@ -48,6 +48,7 @@ public class Model implements Serializable {
     //constructor
     private Model(){
 
+        webServiceResponse = new ArrayList<>();
 
         //should be retrieved from bluetooth and separate from users devises (separate ArrayList should be made eventually) retrieved by webservice on login time
         availableDevices =generateAvailableDeviceArrayList();
@@ -61,7 +62,6 @@ public class Model implements Serializable {
         //only for currentUser to deselect availableDevices from personal lost list.
         lostDevices= generateLostDeviceArrayList(); //App the app encounters available availableDevices from the phones bluetooth it should automatically check with webservice if another users reported these availableDevices as lost and if the send new last known gps location to webservice. Then other user is prompted about new last know location automatically uploaded from other users app of current users lost availableDevices on login time or when accessing lost availableDevices sections of current users app.
 
-        webServiceResponse = new ArrayList<>();
     }
 
 
@@ -98,7 +98,7 @@ public class Model implements Serializable {
         devices.add(new Device("Ivysaur", "Brick", randomStartLocation()));
         devices.add(new Device("Venusaur", "Large-gps", randomStartLocation()));
         devices.add(new Device("Charmander", "cake", randomStartLocation()));
-        devices.add(new Device("Charmeleon", "pie", randomStartLocation()));
+        devices.add(new Device(/*"Charmeleon"*/"Jeppe", "pie", randomStartLocation()));
 
         //after list have been filtered for devices already on current users list then check with webservice if any detected device from bluetooth
         //is present as a lost device on the webservice.
@@ -151,7 +151,7 @@ public class Model implements Serializable {
     //webservice - used to check of devices added from bluetooth match devices on lost devices lst from webservice
     public void checkIfLostDeviceOnWebService(final Device device) {
         PokemonApi pokemonApi = ServiceGenerator.getPokemonApi();
-        Call<PokemonResponse> call = pokemonApi.getPokemon(device.getDeviceName());
+        Call<PokemonResponse> call = pokemonApi.getPokemon(device.getDeviceName().toLowerCase());
         call.enqueue(new Callback<PokemonResponse>() {
             @Override
             public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {

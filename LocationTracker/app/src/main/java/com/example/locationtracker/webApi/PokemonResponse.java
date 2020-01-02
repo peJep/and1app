@@ -1,6 +1,8 @@
 package com.example.locationtracker.webApi;
 
-public class PokemonResponse {
+import java.io.Serializable;
+
+public class PokemonResponse implements Serializable {
 
     private int id;
     private String name;

@@ -98,7 +98,7 @@ public class Model implements Serializable {
         devices.add(new Device("Ivysaur", "Brick", randomStartLocation()));
         devices.add(new Device("Venusaur", "Large-gps", randomStartLocation()));
         devices.add(new Device("Charmander", "cake", randomStartLocation()));
-        devices.add(new Device(/*"Charmeleon"*/"Jeppe", "pie", randomStartLocation()));
+        devices.add(new Device(/*"Charmeleon"*/"Oddish", "pie", randomStartLocation()));
 
         //after list have been filtered for devices already on current users list then check with webservice if any detected device from bluetooth
         //is present as a lost device on the webservice.

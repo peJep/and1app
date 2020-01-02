@@ -16,6 +16,7 @@ import com.example.locationtracker.model.Device;
 import com.example.locationtracker.model.Model;
 import com.example.locationtracker.recyclerView.DeviceAdapter;
 import com.example.locationtracker.viewModel.DeviceListViewModel;
+import com.example.locationtracker.webApi.PokemonResponse;
 
 import java.util.ArrayList;
 
@@ -45,8 +46,12 @@ public class MyDevices extends AppCompatActivity {
         model = Model.getInstance();
         //bundle = getIntent().getExtras();
 
+        String devicesFoundList ="";
+        for (PokemonResponse pokemon: model.getWebServiceResponse()){
+            devicesFoundList+=pokemon.getId()+" "+pokemon.getName()+"\n";
+        }
         //Check if any found devices were on webservice retrofit 2
-        Toast.makeText(this,"Number of lost devices found: "+model.getWebServiceResponse().size(),Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"Number of lost devices found: "+model.getWebServiceResponse().size()+"\n"+devicesFoundList,Toast.LENGTH_LONG).show();
 
         //store current logged in users devices in ViewModel from Model
         viewModel = ViewModelProviders.of(this).get(DeviceListViewModel.class);

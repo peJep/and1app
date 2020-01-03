@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 String strEmail = email.getText().toString();
                 String strPassword = password.getText().toString();
 
-                mAuth.signInWithEmailAndPassword(/*"sds@sds.sds","sds@sds.sds"*/strEmail, strPassword)
+                mAuth.signInWithEmailAndPassword("sds@sds.sds","sds@sds.sds"/*strEmail, strPassword*/)
                         .addOnCompleteListener(MainActivity.this,new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {

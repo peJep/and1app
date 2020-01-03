@@ -11,6 +11,10 @@ import com.example.locationtracker.MyApplicationContext;
 import com.example.locationtracker.webApi.PokemonApi;
 import com.example.locationtracker.webApi.PokemonResponse;
 import com.example.locationtracker.webApi.ServiceGenerator;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,6 +68,19 @@ public class Model implements Serializable {
 
     }
 
+    public static void saveToFirebase() {
+
+        //Firebase User
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        //sync model with Firebase realtime database structure
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference(currentUser.getUid());
+
+        myRef.setValue(getInstance());
+    }
 
     //constructor helper methods
 

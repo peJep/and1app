@@ -62,6 +62,9 @@ public class LostDevices extends AppCompatActivity {
                 }
                 //redraw RecyclerView as needed to reflect changes.
                 updateRecyclerView();
+
+                //re-sync changes to model with Firebase
+                Model.saveToFirebase();
             }
         });
 
